@@ -53,7 +53,7 @@ module pp_generation
   generate 
     genvar i;
       for (i=1; i <=13 ; i++)
-        begin 
+        begin : pg_1
           booth_encoder  booth_encoding (  .Booth_b_DI(Mant_b_D[2*i+1:2*i-1]), .Sel_1x_SO(Sel_1x_S[i-1]), .Sel_2x_SO(Sel_2x_S[i-1]), .Sel_sign_SO(Sel_sign_S[i-1]));
         end
   endgenerate
@@ -69,9 +69,9 @@ module pp_generation
   generate 
     genvar l,j;
       for (l=1; l <=13 ; l++)
-        begin 
+        begin : pg_2 
           for (j=1;j<=C_MANT+2;j++)
-            begin
+            begin : pg_3
               booth_selector  booth_selection (  .Booth_a_DI(Mant_a_D[j:j-1]), .Sel_1x_SI(Sel_1x_S[l-1]), .Sel_2x_SI(Sel_2x_S[l-1]), .Sel_sign_SI(Sel_sign_S[l-1]),.Booth_pp_DO(Booth_pp_D[l-1][j-1]));
             end
         end

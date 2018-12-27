@@ -49,7 +49,7 @@ module LZA
       generate
         genvar i;
             for (i=0;i<=C_WIDTH-1;i++)
-              begin
+              begin : l_1
                 always@(*)
                   begin
                     T_D[i]=A_DI[i] ^ B_DI[i];
@@ -57,7 +57,7 @@ module LZA
                     Z_D[i]=~(A_DI[i] | B_DI[i]);
                  end
               end
-      endgenerate;
+      endgenerate
 
 
   assign F_S[C_WIDTH-1]=(~T_D[C_WIDTH-1])&T_D[C_WIDTH-2];
@@ -65,13 +65,13 @@ module LZA
       generate
         genvar j;
             for (j=1;j<C_WIDTH-1;j++)
-              begin
+              begin : l_2
                 always@(*)
                   begin
                     F_S[j]=  (T_D[j+1]& ((G_D[j]&(~Z_D[j-1])) | (Z_D[j]&(~G_D[j-1])) ) ) | ( (~T_D[j+1])&((Z_D[j]&&(~Z_D[j-1])) | ( G_D[j]&(~G_D[j-1]))) );
                   end
               end
-      endgenerate;
+      endgenerate
    
   assign F_S[0]= T_D[1]&Z_D[0] | (~T_D[1])&(T_D[0] | G_D[0]);
      

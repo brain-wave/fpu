@@ -54,7 +54,7 @@ module fpu_ff
 
   generate
     genvar j;
-    for (j = 0; j < LEN; j++) begin
+    for (j = 0; j < LEN; j++) begin : ff_1
       assign index_lut[j] = $unsigned(j);
       assign in_flipped[j] = in_i[LEN-j-1];
     end
@@ -64,10 +64,10 @@ module fpu_ff
     genvar k;
     genvar l;
     genvar level;
-    for (level = 0; level < NUM_LEVELS; level++) begin
+    for (level = 0; level < NUM_LEVELS; level++) begin : ff_2
     //------------------------------------------------------------
     if (level < NUM_LEVELS-1) begin
-      for (l = 0; l < 2**level; l++) begin
+      for (l = 0; l < 2**level; l++) begin : ff_2_1
         assign sel_nodes[2**level-1+l]   = sel_nodes[2**(level+1)-1+l*2] | sel_nodes[2**(level+1)-1+l*2+1];
         assign index_nodes[2**level-1+l] = (sel_nodes[2**(level+1)-1+l*2] == 1'b1) ?
                                            index_nodes[2**(level+1)-1+l*2] : index_nodes[2**(level+1)-1+l*2+1];
@@ -75,7 +75,7 @@ module fpu_ff
     end
     //------------------------------------------------------------
     if (level == NUM_LEVELS-1) begin
-      for (k = 0; k < 2**level; k++) begin
+      for (k = 0; k < 2**level; k++) begin : ff_3
         // if two successive indices are still in the vector...
         if (k * 2 < LEN-1) begin
           assign sel_nodes[2**level-1+k]   = in_flipped[k*2] | in_flipped[k*2+1];

@@ -44,7 +44,7 @@ module CSA
     generate
       genvar i;
         for (i=0; i<=n-1;i++) 
-          begin
+          begin : c_1
             always@(*)
               begin
                 Sum_DO[i]= A_DI[i] ^ B_DI[i] ^ C_DI[i];
