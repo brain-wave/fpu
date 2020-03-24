@@ -35,31 +35,31 @@ module fpu_mult
   (//Input
    input logic                              Sign_a_DI,
    input logic                              Sign_b_DI,
-   input logic [C_EXP-1:0]                  Exp_a_DI,
-   input logic [C_EXP-1:0]                  Exp_b_DI,
-   input logic [C_MANT:0]                   Mant_a_DI ,
-   input logic [C_MANT:0]                   Mant_b_DI,
+   input logic [C_FPU01_EXP-1:0]                  Exp_a_DI,
+   input logic [C_FPU01_EXP-1:0]                  Exp_b_DI,
+   input logic [C_FPU01_MANT:0]                   Mant_a_DI ,
+   input logic [C_FPU01_MANT:0]                   Mant_b_DI,
 
    //Output
    output logic                             Sign_prenorm_DO,
-   output logic signed [C_EXP_PRENORM-1 :0] Exp_prenorm_DO,
-   output logic        [C_MANT_PRENORM-1:0] Mant_prenorm_DO
+   output logic signed [C_FPU01_EXP_PRENORM-1 :0] Exp_prenorm_DO,
+   output logic        [C_FPU01_MANT_PRENORM-1:0] Mant_prenorm_DO
    );
 
    //Operand components
    logic                                    Sign_a_D;
    logic                                    Sign_b_D;
    logic                                    Sign_prenorm_D;
-   logic [C_EXP-1:0]                        Exp_a_D;
-   logic [C_EXP-1:0]                        Exp_b_D;
-   logic [C_MANT:0]                         Mant_a_D;
-   logic [C_MANT:0]                         Mant_b_D;
+   logic [C_FPU01_EXP-1:0]                        Exp_a_D;
+   logic [C_FPU01_EXP-1:0]                        Exp_b_D;
+   logic [C_FPU01_MANT:0]                         Mant_a_D;
+   logic [C_FPU01_MANT:0]                         Mant_b_D;
 
    //Exponent calculations
-   logic signed [C_EXP_PRENORM-1:0]         Exp_prenorm_D;       //signed exponent for normalizer
+   logic signed [C_FPU01_EXP_PRENORM-1:0]         Exp_prenorm_D;       //signed exponent for normalizer
       
    //Multiplication
-   logic [C_MANT_PRENORM-1:0]               Mant_prenorm_D;
+   logic [C_FPU01_MANT_PRENORM-1:0]               Mant_prenorm_D;
 
    /////////////////////////////////////////////////////////////////////////////
    // Assign Inputs                                                           //
@@ -75,7 +75,7 @@ module fpu_mult
    // Output calculations                                                     //
    /////////////////////////////////////////////////////////////////////////////
    assign Sign_prenorm_D = Sign_a_D ^ Sign_b_D;
-   assign Exp_prenorm_D  = signed'({2'b0,Exp_a_D}) + signed'({2'b0,Exp_b_D}) - signed'(C_BIAS);
+   assign Exp_prenorm_D  = signed'({2'b0,Exp_a_D}) + signed'({2'b0,Exp_b_D}) - signed'(C_FPU01_BIAS);
    assign Mant_prenorm_D = Mant_a_D * Mant_b_D;
 
    /////////////////////////////////////////////////////////////////////////////

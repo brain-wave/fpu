@@ -35,24 +35,24 @@ module fpu_add
   (//Input
    input logic               Sign_a_DI,
    input logic               Sign_b_DI,
-   input logic [C_EXP-1:0]   Exp_a_DI,
-   input logic [C_EXP-1:0]   Exp_b_DI,
-   input logic [C_MANT:0]    Mant_a_DI ,
-   input logic [C_MANT:0]    Mant_b_DI,
+   input logic [C_FPU01_EXP-1:0]   Exp_a_DI,
+   input logic [C_FPU01_EXP-1:0]   Exp_b_DI,
+   input logic [C_FPU01_MANT:0]    Mant_a_DI ,
+   input logic [C_FPU01_MANT:0]    Mant_b_DI,
 
    //Output
    output logic                              Sign_prenorm_DO,
-   output logic signed [C_EXP_PRENORM-1 :0]  Exp_prenorm_DO,
-   output logic        [C_MANT_PRENORM-1:0]  Mant_prenorm_DO
+   output logic signed [C_FPU01_EXP_PRENORM-1 :0]  Exp_prenorm_DO,
+   output logic        [C_FPU01_MANT_PRENORM-1:0]  Mant_prenorm_DO
    );
    
    //Operand components
    logic              Sign_a_D;
    logic              Sign_b_D;
-   logic [C_EXP-1:0]  Exp_a_D;
-   logic [C_EXP-1:0]  Exp_b_D;
-   logic [C_MANT:0]   Mant_a_D;
-   logic [C_MANT:0]   Mant_b_D;
+   logic [C_FPU01_EXP-1:0]  Exp_a_D;
+   logic [C_FPU01_EXP-1:0]  Exp_b_D;
+   logic [C_FPU01_MANT:0]   Mant_a_D;
+   logic [C_FPU01_MANT:0]   Mant_b_D;
 
    //Post-Normalizer result
    logic              Sign_norm_D;
@@ -73,8 +73,8 @@ module fpu_add
 
    logic             Exp_agtb_S;
    logic             Exp_equal_S;
-   logic [C_EXP-1:0] Exp_diff_D;
-   logic [C_EXP-1:0] Exp_prenorm_D;
+   logic [C_FPU01_EXP-1:0] Exp_diff_D;
+   logic [C_FPU01_EXP-1:0] Exp_prenorm_D;
    
    assign Exp_agtb_S  = Exp_a_D > Exp_b_D;
    assign Exp_equal_S = Exp_diff_D == 0;
@@ -98,17 +98,17 @@ module fpu_add
    /////////////////////////////////////////////////////////////////////////////
 
    logic                       Mant_agtb_S;
-   logic [C_MANT_SHIFTIN-1:0]  Mant_shiftIn_D;
-   logic [C_MANT_SHIFTED-1:0]  Mant_shifted_D;
+   logic [C_FPU01_MANT_SHIFTIN-1:0]  Mant_shiftIn_D;
+   logic [C_FPU01_MANT_SHIFTED-1:0]  Mant_shifted_D;
    logic                       Mant_sticky_D;
-   logic [C_MANT_SHIFTED-1:0]  Mant_unshifted_D;
+   logic [C_FPU01_MANT_SHIFTED-1:0]  Mant_unshifted_D;
 
    //Main Adder 
-   logic [C_MANT_ADDIN-1:0]   Mant_addInA_D;
-   logic [C_MANT_ADDIN-1:0]   Mant_addInB_D;
-   logic [C_MANT_ADDOUT-1:0]  Mant_addOut_D;
+   logic [C_FPU01_MANT_ADDIN-1:0]   Mant_addInA_D;
+   logic [C_FPU01_MANT_ADDIN-1:0]   Mant_addInB_D;
+   logic [C_FPU01_MANT_ADDOUT-1:0]  Mant_addOut_D;
 
-   logic [C_MANT_PRENORM-1:0] Mant_prenorm_D;
+   logic [C_FPU01_MANT_PRENORM-1:0] Mant_prenorm_D;
    
    //Inversion and carry for Subtraction
    logic        Mant_addCarryIn_D;
@@ -126,10 +126,10 @@ module fpu_add
    always_comb //sticky bit
      begin
         Mant_sticky_D = 1'b0;
-        if (Exp_diff_D >= (C_MANT+3)) // 23 + guard, round, sticky
+        if (Exp_diff_D >= (C_FPU01_MANT+3)) // 23 + guard, round, sticky
           Mant_sticky_D = | Mant_shiftIn_D;
         else
-          Mant_sticky_D = | (Mant_shiftIn_D << ((C_MANT+3) - Exp_diff_D));
+          Mant_sticky_D = | (Mant_shiftIn_D << ((C_FPU01_MANT+3) - Exp_diff_D));
      end
    assign Mant_shifted_D = {(Mant_shiftIn_D >> Exp_diff_D), Mant_sticky_D};
 
@@ -159,7 +159,7 @@ module fpu_add
 
    assign Mant_addOut_D     = Mant_addInA_D + Mant_addInB_D + Mant_addCarryIn_D;
 
-   assign Mant_prenorm_D    = {(Mant_addOut_D[C_MANT_ADDOUT-1] & ~Subtract_S), Mant_addOut_D[C_MANT_ADDOUT-2:0], 20'b0};
+   assign Mant_prenorm_D    = {(Mant_addOut_D[C_FPU01_MANT_ADDOUT-1] & ~Subtract_S), Mant_addOut_D[C_FPU01_MANT_ADDOUT-2:0], 20'b0};
 
    /////////////////////////////////////////////////////////////////////////////
    // Sign operations

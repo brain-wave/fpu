@@ -37,7 +37,7 @@ module LZA
   (
    input  logic [C_WIDTH-1:0]                A_DI,
    input  logic [C_WIDTH-1:0]                B_DI,
-   output logic [C_LEADONE_WIDTH-1:0]        Leading_one_DO,
+   output logic [C_FMAC_LEADONE_WIDTH-1:0]        Leading_one_DO,
    output logic                              No_one_SO
    );
 
@@ -75,7 +75,7 @@ module LZA
    
   assign F_S[0]= T_D[1]&Z_D[0] | (~T_D[1])&(T_D[0] | G_D[0]);
      
- logic [C_LEADONE_WIDTH-1:0]                Leading_one_D;
+ logic [C_FMAC_LEADONE_WIDTH-1:0]                Leading_one_D;
  logic                                      No_one_S;
    fpu_ff
    #(

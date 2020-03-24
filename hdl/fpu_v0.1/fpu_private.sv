@@ -41,17 +41,17 @@ module fpu_private
    // enable
    input logic                fpu_en_i,
    // inputs
-   input logic [C_OP-1:0]     operand_a_i,
-   input logic [C_OP-1:0]     operand_b_i,
-   input logic [C_OP-1:0]     operand_c_i,
-   input logic [C_RM-1:0]     rm_i,
-   input logic [C_CMD-1:0]    fpu_op_i,
-   input logic [C_PC-1:0]     prec_i,
+   input logic [C_FPU01_OP-1:0]     operand_a_i,
+   input logic [C_FPU01_OP-1:0]     operand_b_i,
+   input logic [C_FPU01_OP-1:0]     operand_c_i,
+   input logic [C_FPU01_RM-1:0]     rm_i,
+   input logic [C_FPU01_CMD-1:0]    fpu_op_i,
+   input logic [C_FPU01_PC-1:0]     prec_i,
   
    // outputs
-   output logic [C_OP-1:0]    result_o,
+   output logic [C_FPU01_OP-1:0]    result_o,
    output logic               valid_o,
-   output logic [C_FFLAG-1:0] flags_o,
+   output logic [C_FPU01_FFLAG-1:0] flags_o,
    output logic               divsqrt_busy_o
    );
 
@@ -59,9 +59,9 @@ module fpu_private
    logic                     fpu_enable;
    logic                     fma_enable;
 
-   assign divsqrt_enable = fpu_en_i & ((fpu_op_i==C_FPU_DIV_CMD) | (fpu_op_i==C_FPU_SQRT_CMD));
-   assign fpu_enable     = fpu_en_i & ((fpu_op_i==C_FPU_ADD_CMD) | (fpu_op_i==C_FPU_SUB_CMD) | (fpu_op_i==C_FPU_MUL_CMD) | (fpu_op_i==C_FPU_I2F_CMD) | (fpu_op_i==C_FPU_F2I_CMD));
-   assign fma_enable     = fpu_en_i & ((fpu_op_i==C_FPU_FMADD_CMD) | (fpu_op_i==C_FPU_FMSUB_CMD) | (fpu_op_i==C_FPU_FNMADD_CMD)| (fpu_op_i==C_FPU_FNMSUB_CMD));
+   assign divsqrt_enable = fpu_en_i & ((fpu_op_i==C_FPU01_DIV_CMD) | (fpu_op_i==C_FPU01_SQRT_CMD));
+   assign fpu_enable     = fpu_en_i & ((fpu_op_i==C_FPU01_ADD_CMD) | (fpu_op_i==C_FPU01_SUB_CMD) | (fpu_op_i==C_FPU01_MUL_CMD) | (fpu_op_i==C_FPU01_I2F_CMD) | (fpu_op_i==C_FPU01_F2I_CMD));
+   assign fma_enable     = fpu_en_i & ((fpu_op_i==C_FPU01_FMADD_CMD) | (fpu_op_i==C_FPU01_FMSUB_CMD) | (fpu_op_i==C_FPU01_FNMADD_CMD)| (fpu_op_i==C_FPU01_FNMSUB_CMD));
 
 
    ///////////////////////////////////////////////
@@ -71,7 +71,7 @@ module fpu_private
    logic [31:0]                 fpu_operand_a;
    logic [31:0]                 fpu_operand_b;
    logic [31:0]                 fpu_result;
-   logic [C_FFLAG-1:0]          fpu_flags;
+   logic [C_FPU01_FFLAG-1:0]          fpu_flags;
    logic                        fpu_of, fpu_uf, fpu_zero, fpu_ix, fpu_iv, fpu_inf;
    
    assign fpu_operand_a = (fpu_enable) ? operand_a_i : '0;
@@ -113,12 +113,12 @@ module fpu_private
    logic [31:0]                divsqrt_operand_a;
    logic [31:0]                divsqrt_operand_b;
    logic [31:0]                divsqrt_result;
-   logic [C_FFLAG-1:0]         divsqrt_flags;
+   logic [C_FPU01_FFLAG-1:0]         divsqrt_flags;
    logic                       divsqrt_nv;
    logic                       divsqrt_ix;
    
-   assign sqrt_start = divsqrt_enable & (fpu_op_i == C_FPU_SQRT_CMD);
-   assign div_start  = divsqrt_enable & (fpu_op_i == C_FPU_DIV_CMD);
+   assign sqrt_start = divsqrt_enable & (fpu_op_i == C_FPU01_SQRT_CMD);
+   assign div_start  = divsqrt_enable & (fpu_op_i == C_FPU01_DIV_CMD);
 
    assign divsqrt_operand_a = (div_start | sqrt_start) ? operand_a_i : '0;
    assign divsqrt_operand_b = (div_start)              ? operand_b_i : '0;
@@ -158,19 +158,19 @@ module fpu_private
       
    logic [1:0]                  fma_op;
    logic                        fma_valid;
-   logic [C_FFLAG-1:0]          fma_flags;
+   logic [C_FPU01_FFLAG-1:0]          fma_flags;
       
    always_comb begin
       fma_op = 2'b00;
       
       unique case (fpu_op_i)
-        C_FPU_FMADD_CMD:
+        C_FPU01_FMADD_CMD:
           fma_op = 2'b00;
-        C_FPU_FMSUB_CMD:
+        C_FPU01_FMSUB_CMD:
           fma_op = 2'b01;
-        C_FPU_FNMADD_CMD:
+        C_FPU01_FNMADD_CMD:
           fma_op = 2'b11;
-        C_FPU_FNMSUB_CMD:
+        C_FPU01_FNMSUB_CMD:
           fma_op = 2'b10;
         default:
           fma_op = 2'b0;
@@ -178,7 +178,7 @@ module fpu_private
       end
 
 
-`ifndef PULP_FPGA_EMUL
+//`ifndef PULP_FPGA_EMUL
 
    fp_fma_wrapper
      #(
@@ -202,8 +202,8 @@ module fpu_private
       .Ready_o          (               ),
       .Ack_i            ( 1'b1          )
       );
-`else
-   logic [2:0] tuser;
+/*`else
+#   logic [2:0] tuser;
    
    assign fma_operand_a = (fma_enable) ? operand_a_i                                      : '0;
    assign fma_operand_b = (fma_enable) ? {operand_b_i[31] ^ fma_op[1], operand_b_i[30:0]} : '0;
@@ -229,7 +229,7 @@ module fpu_private
    
    assign fma_flags = {tuser[2], 1'b0, tuser[1], tuser[0], 1'b0};
 `endif
-
+*/
    // output assignment
    
    assign valid_o  = divsqrt_valid | fpu_valid | fma_valid;

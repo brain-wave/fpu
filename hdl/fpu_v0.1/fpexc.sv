@@ -36,17 +36,17 @@ import fpu_defs::*;
 
 module fpexc 
   (//Input
-   input logic [C_MANT:0]   Mant_a_DI,
-   input logic [C_MANT:0]   Mant_b_DI,
-   input logic [C_EXP-1:0]  Exp_a_DI,
-   input logic [C_EXP-1:0]  Exp_b_DI,
+   input logic [C_FPU01_MANT:0]   Mant_a_DI,
+   input logic [C_FPU01_MANT:0]   Mant_b_DI,
+   input logic [C_FPU01_EXP-1:0]  Exp_a_DI,
+   input logic [C_FPU01_EXP-1:0]  Exp_b_DI,
    input logic              Sign_a_DI,
    input logic              Sign_b_DI,
 
-   input logic [C_MANT:0]   Mant_norm_DI,
-   input logic [C_EXP-1:0]  Exp_res_DI,
+   input logic [C_FPU01_MANT:0]   Mant_norm_DI,
+   input logic [C_FPU01_EXP-1:0]  Exp_res_DI,
 
-   input logic [C_CMD-1:0]  Op_SI,
+   input logic [C_FPU01_CMD-1:0]  Op_SI,
 
    input logic Mant_rounded_SI,
    input logic Exp_OF_SI,
@@ -86,42 +86,42 @@ module fpexc
      
    logic        Mant_zero_S;
   
-   assign Inf_a_S = (Exp_a_DI == C_EXP_INF) & (Mant_a_DI[C_MANT-1:0] == C_MANT_NoHB_ZERO);
-   assign Inf_b_S = (Exp_b_DI == C_EXP_INF) & (Mant_b_DI[C_MANT-1:0] == C_MANT_NoHB_ZERO);
+   assign Inf_a_S = (Exp_a_DI == C_FPU01_EXP_INF) & (Mant_a_DI[C_FPU01_MANT-1:0] == C_FPU01_MANT_NoHB_ZERO);
+   assign Inf_b_S = (Exp_b_DI == C_FPU01_EXP_INF) & (Mant_b_DI[C_FPU01_MANT-1:0] == C_FPU01_MANT_NoHB_ZERO);
 
-   assign Zero_a_S = (Exp_a_DI == C_EXP_ZERO) & (Mant_a_DI == C_MANT_ZERO);
-   assign Zero_b_S = (Exp_b_DI == C_EXP_ZERO) & (Mant_b_DI == C_MANT_ZERO);
+   assign Zero_a_S = (Exp_a_DI == C_FPU01_EXP_ZERO) & (Mant_a_DI == C_FPU01_MANT_ZERO);
+   assign Zero_b_S = (Exp_b_DI == C_FPU01_EXP_ZERO) & (Mant_b_DI == C_FPU01_MANT_ZERO);
 
-   assign NaN_a_S = (Exp_a_DI == C_EXP_INF) & (Mant_a_DI[C_MANT-1:0] != C_MANT_NoHB_ZERO);
-   assign NaN_b_S = (Exp_b_DI == C_EXP_INF) & (Mant_b_DI[C_MANT-1:0] != C_MANT_NoHB_ZERO);
+   assign NaN_a_S = (Exp_a_DI == C_FPU01_EXP_INF) & (Mant_a_DI[C_FPU01_MANT-1:0] != C_FPU01_MANT_NoHB_ZERO);
+   assign NaN_b_S = (Exp_b_DI == C_FPU01_EXP_INF) & (Mant_b_DI[C_FPU01_MANT-1:0] != C_FPU01_MANT_NoHB_ZERO);
 
-   assign Mant_zero_S = Mant_norm_DI == C_MANT_ZERO;
+   assign Mant_zero_S = Mant_norm_DI == C_FPU01_MANT_ZERO;
    
    
    /////////////////////////////////////////////////////////////////////////////
    // flag assignments                                                        //
    /////////////////////////////////////////////////////////////////////////////
    
-   assign OF_SO   = (Op_SI == C_FPU_F2I_CMD) ? OF_SI : (Exp_OF_SI & ~Mant_zero_S) | (~IV_SO & (Inf_a_S ^ Inf_b_S) & (Op_SI != C_FPU_I2F_CMD));
-   assign UF_SO   = (Op_SI == C_FPU_F2I_CMD) ? UF_SI : Exp_UF_SI & Mant_rounded_SI;
-   assign Zero_SO = (Op_SI == C_FPU_F2I_CMD) ? Zero_SI : (Mant_zero_S & ~IV_SO); 
-   assign IX_SO   = (Op_SI == C_FPU_F2I_CMD) ? IX_SI : Mant_rounded_SI | OF_SO; 
+   assign OF_SO   = (Op_SI == C_FPU01_F2I_CMD) ? OF_SI : (Exp_OF_SI & ~Mant_zero_S) | (~IV_SO & (Inf_a_S ^ Inf_b_S) & (Op_SI != C_FPU01_I2F_CMD));
+   assign UF_SO   = (Op_SI == C_FPU01_F2I_CMD) ? UF_SI : Exp_UF_SI & Mant_rounded_SI;
+   assign Zero_SO = (Op_SI == C_FPU01_F2I_CMD) ? Zero_SI : (Mant_zero_S & ~IV_SO); 
+   assign IX_SO   = (Op_SI == C_FPU01_F2I_CMD) ? IX_SI : Mant_rounded_SI | OF_SO; 
 
    always_comb //check operation validity
      begin
         IV_SO = 1'b0;
         case (Op_SI)
-          C_FPU_ADD_CMD, C_FPU_SUB_CMD : //input logic already adjusts operands 
+          C_FPU01_ADD_CMD, C_FPU01_SUB_CMD : //input logic already adjusts operands 
             begin
                if (((Inf_a_S & Inf_b_S) & (Sign_a_DI ^ Sign_b_DI)) | NaN_a_S | NaN_b_S)
                  IV_SO = 1'b1;
             end
-          C_FPU_MUL_CMD :
+          C_FPU01_MUL_CMD :
             begin
             if (((Inf_a_S & Zero_b_S) | (Inf_b_S & Zero_a_S)) | NaN_a_S | NaN_b_S)
               IV_SO = 1'b1;
             end
-          C_FPU_F2I_CMD :
+          C_FPU01_F2I_CMD :
             IV_SO = IV_SI;
         endcase
      end
@@ -131,21 +131,21 @@ module fpexc
      begin
         Inf_temp_S = 1'b0;
         case(Op_SI)
-          C_FPU_ADD_CMD, C_FPU_SUB_CMD : //input logic already adjusts operands
+          C_FPU01_ADD_CMD, C_FPU01_SUB_CMD : //input logic already adjusts operands
             if ((Inf_a_S ^ Inf_b_S) | ((Inf_a_S & Inf_b_S) & ~(Sign_a_DI ^ Sign_b_DI)))
               Inf_temp_S = 1'b1;
-          C_FPU_MUL_CMD :
+          C_FPU01_MUL_CMD :
             if ((Inf_a_S & ~Zero_b_S) | (Inf_b_S & ~Zero_a_S))
               Inf_temp_S = 1'b1;
         endcase // case (Op_SI)
      end // always_comb begin
 
-   assign Inf_SO = (Op_SI == C_FPU_F2I_CMD) ? Inf_SI : Inf_temp_S | (Exp_OF_SI & ~Mant_zero_S);
+   assign Inf_SO = (Op_SI == C_FPU01_F2I_CMD) ? Inf_SI : Inf_temp_S | (Exp_OF_SI & ~Mant_zero_S);
 
    /////////////////////////////////////////////////////////////////////////////
    // flags/signals for result manipulation                                   //
    /////////////////////////////////////////////////////////////////////////////
-   assign Exp_toZero_SO =(Op_SI == C_FPU_I2F_CMD) ? (Zero_a_S & ~Sign_a_DI) : Exp_UF_SI | (Mant_zero_S & ~Exp_toInf_SO);
+   assign Exp_toZero_SO =(Op_SI == C_FPU01_I2F_CMD) ? (Zero_a_S & ~Sign_a_DI) : Exp_UF_SI | (Mant_zero_S & ~Exp_toInf_SO);
    assign Exp_toInf_SO = (OF_SO | IV_SO);
    assign Mant_toZero_SO = Inf_SO;
 

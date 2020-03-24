@@ -39,15 +39,15 @@ module fpu
    input logic 	           Rst_RBI,
 
    //Input Operands
-   input logic [C_OP-1:0]  Operand_a_DI,
-   input logic [C_OP-1:0]  Operand_b_DI,
-   input logic [C_RM-1:0]  RM_SI,    //Rounding Mode
-   input logic [C_CMD-1:0] OP_SI,
+   input logic [C_FPU01_OP-1:0]  Operand_a_DI,
+   input logic [C_FPU01_OP-1:0]  Operand_b_DI,
+   input logic [C_FPU01_RM-1:0]  RM_SI,    //Rounding Mode
+   input logic [C_FPU01_CMD-1:0] OP_SI,
    input logic             Enable_SI,
 
    input logic             Stall_SI,
 
-   output logic [C_OP-1:0] Result_DO,
+   output logic [C_FPU01_OP-1:0] Result_DO,
    //Output-Flags
    output logic            OF_SO,    //Overflow
    output logic            UF_SO,    //Underflow
@@ -58,11 +58,11 @@ module fpu
    );
 
    //Internal Operands
-   logic [C_OP-1:0]        Operand_a_D;
-   logic [C_OP-1:0]        Operand_b_D;
+   logic [C_FPU01_OP-1:0]        Operand_a_D;
+   logic [C_FPU01_OP-1:0]        Operand_b_D;
 
-   logic [C_RM-1:0]        RM_S;
-   logic [C_CMD-1:0]       OP_S;
+   logic [C_FPU01_RM-1:0]        RM_S;
+   logic [C_FPU01_CMD-1:0]       OP_S;
 
    logic                   Stall_S;
 
@@ -101,7 +101,7 @@ module fpu
    logic              IV_S;
    logic              Inf_S;
 
-   logic [C_OP-1:0]   Result_D;
+   logic [C_FPU01_OP-1:0]   Result_D;
 
 
   fpu_core fpcore

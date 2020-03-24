@@ -40,13 +40,13 @@ module fpu_shared
    marx_apu_if.apu Interface
    );
 
-   logic [C_OP-1:0]  Operand_a_D;
-   logic [C_OP-1:0]  Operand_b_D;
-   logic [C_CMD-1:0] Op_S;
-   logic [C_RM-1:0]  RM_S;
+   logic [C_FPU01_OP-1:0]  Operand_a_D;
+   logic [C_FPU01_OP-1:0]  Operand_b_D;
+   logic [C_FPU01_CMD-1:0] Op_S;
+   logic [C_FPU01_RM-1:0]  RM_S;
 
    logic             Valid_S;
-   logic [C_TAG-1:0] Tag_D;
+   logic [C_FPU01_TAG-1:0] Tag_D;
 
    /////////////////////////////////////////////////////////////////////////////
    // Optional Input Register
@@ -55,13 +55,13 @@ module fpu_shared
    generate
       if (ADD_REGISTER == 1)
         begin
-           logic [C_OP-1:0]  Operand_a_DN;
-           logic [C_OP-1:0]  Operand_b_DN;
-           logic [C_RM-1:0]  RM_SN;
-           logic [C_CMD-1:0] Op_SN;
+           logic [C_FPU01_OP-1:0]  Operand_a_DN;
+           logic [C_FPU01_OP-1:0]  Operand_b_DN;
+           logic [C_FPU01_RM-1:0]  RM_SN;
+           logic [C_FPU01_CMD-1:0] Op_SN;
 
            logic             Valid_SN;
-           logic [C_TAG-1:0] Tag_DN;
+           logic [C_FPU01_TAG-1:0] Tag_DN;
 
            assign  Operand_a_DN = Interface.arga_ds_d;
            assign  Operand_b_DN = Interface.argb_ds_d;
@@ -108,9 +108,9 @@ module fpu_shared
    // FPU core instance
    /////////////////////////////////////////////////////////////////////////////
 
-   logic [C_OP-1:0]   Result_D;
+   logic [C_FPU01_OP-1:0]   Result_D;
    
-   logic [C_FLAG-1:0] Flags_S;
+   logic [C_FPU01_FLAG-1:0] Flags_S;
    logic              UF_S;
    logic              OF_S;
    logic              Zero_S;
@@ -146,8 +146,8 @@ module fpu_shared
 
    logic              ValidDelayed_SP;
    logic              ValidDelayed_SN;
-   logic [C_TAG-1:0]  TagDelayed_DP;
-   logic [C_TAG-1:0]  TagDelayed_DN;
+   logic [C_FPU01_TAG-1:0]  TagDelayed_DP;
+   logic [C_FPU01_TAG-1:0]  TagDelayed_DN;
 
    assign ValidDelayed_SN = Valid_S;
    assign TagDelayed_DN   = Tag_D;

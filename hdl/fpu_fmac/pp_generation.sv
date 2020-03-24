@@ -33,10 +33,10 @@ import fpu_defs_fmac::*;
 
 module pp_generation
   (//Inputs
-   input logic [C_MANT:0]                            Mant_a_DI,
-   input logic [C_MANT:0]                            Mant_b_DI,
+   input logic [C_FMAC_MANT:0]                            Mant_a_DI,
+   input logic [C_FMAC_MANT:0]                            Mant_b_DI,
    //Outputs
-   output logic [12:0] [2*C_MANT+2:0]                Pp_index_DO
+   output logic [12:0] [2*C_FMAC_MANT+2:0]                Pp_index_DO
    );
    
   logic                                              Sel_xnor_S;
@@ -44,7 +44,7 @@ module pp_generation
 //                        Booth Encoding (13)                                 //
 ////////////////////////////////////////////////////////////////////////////////
 
-  logic [C_MANT+5:0]                                 Mant_b_D;
+  logic [C_FMAC_MANT+5:0]                                 Mant_b_D;
   assign Mant_b_D={2'b00,Mant_b_DI,2'b00};//left shift 2 bit.
 
   logic  [12:0]                                      Sel_1x_S;
@@ -62,15 +62,15 @@ module pp_generation
 //                        Booth Selectors (13)                                //
 ////////////////////////////////////////////////////////////////////////////////
 
-  logic [C_MANT+2:0]                                Mant_a_D;
+  logic [C_FMAC_MANT+2:0]                                Mant_a_D;
   assign Mant_a_D = {Mant_a_DI,1'b0};
-  logic [12:0] [C_MANT+1:0]                         Booth_pp_D;
+  logic [12:0] [C_FMAC_MANT+1:0]                         Booth_pp_D;
 
   generate 
     genvar l,j;
       for (l=1; l <=13 ; l++)
         begin : pg_2 
-          for (j=1;j<=C_MANT+2;j++)
+          for (j=1;j<=C_FMAC_MANT+2;j++)
             begin : pg_3
               booth_selector  booth_selection (  .Booth_a_DI(Mant_a_D[j:j-1]), .Sel_1x_SI(Sel_1x_S[l-1]), .Sel_2x_SI(Sel_2x_S[l-1]), .Sel_sign_SI(Sel_sign_S[l-1]),.Booth_pp_DO(Booth_pp_D[l-1][j-1]));
             end

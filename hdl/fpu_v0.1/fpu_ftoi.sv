@@ -34,11 +34,11 @@ import fpu_defs::*;
 module fpu_ftoi
   (//Input
    input logic             Sign_a_DI,
-   input logic [C_EXP-1:0] Exp_a_DI,
-   input logic [C_MANT:0]  Mant_a_DI,
+   input logic [C_FPU01_EXP-1:0] Exp_a_DI,
+   input logic [C_FPU01_MANT:0]  Mant_a_DI,
    
    //Output
-   output logic [C_OP-1:0] Result_DO,
+   output logic [C_FPU01_OP-1:0] Result_DO,
   
    output logic            OF_SO,       //Overflow
    output logic            UF_SO,       //Underflow
@@ -50,11 +50,11 @@ module fpu_ftoi
 
    //Internal Operands
    logic              Sign_a_D;            
-   logic [C_EXP-1:0] 	Exp_a_D;             
-   logic [C_MANT:0]   Mant_a_D;           
+   logic [C_FPU01_EXP-1:0] 	Exp_a_D;             
+   logic [C_FPU01_MANT:0]   Mant_a_D;           
            
    //Output result
-   logic [C_OP-1:0]   Result_D;                
+   logic [C_FPU01_OP-1:0]   Result_D;                
 
    //Disassemble Operand
    assign Sign_a_D = Sign_a_DI;
@@ -64,25 +64,25 @@ module fpu_ftoi
    /////////////////////////////////////////////////////////////////////////////
    // Conversion
    /////////////////////////////////////////////////////////////////////////////
-   logic signed [C_EXP_SHIFT-1:0]   Shift_amount_D; //8
-   logic [C_MANT+C_OP-2:0]          Temp_shift_D;          // 23 bit fraction + 31 bit integer (w/o sign-bit) 
-   logic [C_OP-1:0]                 Temp_twos_D;       
+   logic signed [C_FPU01_EXP_SHIFT-1:0]   Shift_amount_D; //8
+   logic [C_FPU01_MANT+C_FPU01_OP-2:0]          Temp_shift_D;          // 23 bit fraction + 31 bit integer (w/o sign-bit) 
+   logic [C_FPU01_OP-1:0]                 Temp_twos_D;       
    logic                            Shift_amount_neg_S;
    logic                            Result_zero_S;
    logic                            Input_zero_S;
       
-   assign Shift_amount_D     = signed'({1'b0,Exp_a_D}) - signed'(C_SHIFT_BIAS); 
-   assign Shift_amount_neg_S = Shift_amount_D[C_EXP_SHIFT-1]; //8
+   assign Shift_amount_D     = signed'({1'b0,Exp_a_D}) - signed'(C_FPU01_SHIFT_BIAS); 
+   assign Shift_amount_neg_S = Shift_amount_D[C_FPU01_EXP_SHIFT-1]; //8
    
    assign Temp_shift_D = Shift_amount_neg_S ? '0 : (Mant_a_D << Shift_amount_D);
-   assign Temp_twos_D  = ~{1'b0,Temp_shift_D[C_MANT+C_OP-2:C_MANT]} + 1'b1;
+   assign Temp_twos_D  = ~{1'b0,Temp_shift_D[C_FPU01_MANT+C_FPU01_OP-2:C_FPU01_MANT]} + 1'b1;
    
    /////////////////////////////////////////////////////////////////////////////
    // Output assignments
    /////////////////////////////////////////////////////////////////////////////  
 
    //assign result
-   assign Result_D  = OF_SO ? (Sign_a_D ? C_MINF : C_INF) : (Sign_a_D ? Temp_twos_D : {Sign_a_D, Temp_shift_D[C_MANT+C_OP-2:C_MANT]});
+   assign Result_D  = OF_SO ? (Sign_a_D ? C_FPU01_MINF : C_FPU01_INF) : (Sign_a_D ? Temp_twos_D : {Sign_a_D, Temp_shift_D[C_FPU01_MANT+C_FPU01_OP-2:C_FPU01_MANT]});
    assign Result_DO = Result_D;
 
    //assign flags
@@ -90,9 +90,9 @@ module fpu_ftoi
    assign Input_zero_S  = (~|{Exp_a_D,Mant_a_D});
 
    assign UF_SO   = 1'b0;
-   assign OF_SO   = Shift_amount_D > (C_OP-2);
+   assign OF_SO   = Shift_amount_D > (C_FPU01_OP-2);
    assign Zero_SO = Result_zero_S & ~OF_SO;
-   assign IX_SO   = (|Temp_shift_D[C_MANT-1:0] | Shift_amount_neg_S | OF_SO) & ~Input_zero_S;
+   assign IX_SO   = (|Temp_shift_D[C_FPU01_MANT-1:0] | Shift_amount_neg_S | OF_SO) & ~Input_zero_S;
    assign IV_SO   = (&Exp_a_D) && (|Mant_a_D);    
    assign Inf_SO  = 1'b0;
  

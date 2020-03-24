@@ -39,15 +39,15 @@ module riscv_fpu
    input logic             rst_n,
 
    //Input Operands
-   input logic [C_OP-1:0]  operand_a_i,
-   input logic [C_OP-1:0]  operand_b_i,
-   input logic [C_RM-1:0]  rounding_mode_i,    //Rounding Mode
-   input logic [C_CMD-1:0] operator_i,
+   input logic [C_FPU01_OP-1:0]  operand_a_i,
+   input logic [C_FPU01_OP-1:0]  operand_b_i,
+   input logic [C_FPU01_RM-1:0]  rounding_mode_i,    //Rounding Mode
+   input logic [C_FPU01_CMD-1:0] operator_i,
    input logic             enable_i,
 
    input logic             stall_i,
 
-   output logic [C_OP-1:0] result_o,
+   output logic [C_FPU01_OP-1:0] result_o,
    //Output-Flags
    output logic            fpu_ready_o,   // high if fpu is ready
    output logic            result_valid_o // result is valid
@@ -58,11 +58,11 @@ module riscv_fpu
    localparam CYCLES = 2;
 
    //Internal Operands
-   logic [C_OP-1:0]             operand_a_q;
-   logic [C_OP-1:0]             operand_b_q;
+   logic [C_FPU01_OP-1:0]             operand_a_q;
+   logic [C_FPU01_OP-1:0]             operand_b_q;
 
-   logic [C_RM-1:0]             rounding_mode_q;
-   logic [C_CMD-1:0]            operator_q;
+   logic [C_FPU01_RM-1:0]             rounding_mode_q;
+   logic [C_FPU01_CMD-1:0]            operator_q;
 
    logic [$clog2(CYCLES):0]     valid_count_q, valid_count_n;
 
